@@ -28,6 +28,7 @@ class VogueMerry : public rclcpp::Node {
 
     private:
         void init_interfaces();
+        void init_parameters();
         void integration_euler(float u1);
         void publish_pose();
         void command_callback(const geometry_msgs::msg::Twist &msg);
@@ -36,10 +37,12 @@ class VogueMerry : public rclcpp::Node {
         rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_publisher_; // objet publisher position
         rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
 
-        Matrix<double,3,1>x_ = Matrix<double,3,1>::Zero();
+        //Matrix<double,3,1>x_ = Matrix<double,3,1>::Zero();
+        double x0,y0,cap0;
         Matrix<double,3,1>dx_ = Matrix<double,3,1>::Zero();
+        Matrix<double,3,1>x_;
         float dt = 0.1;
-        double cap;
+        double cap = 0.0;
         std::chrono::milliseconds freq = 400ms;
         };
 

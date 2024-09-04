@@ -2,6 +2,11 @@
 
 VogueMerry::VogueMerry():  Node("Zoboat") {
             init_interfaces();
+
+            x_(0) = x0;
+            x_(1) = y0;
+            x_(2) = cap0;
+
         } 
 
 void VogueMerry::init_interfaces(){
@@ -16,16 +21,30 @@ void VogueMerry::init_interfaces(){
     //Abonnement au message Twist pour la commande
     subscription_ = this->create_subscription<geometry_msgs::msg::Twist>("angular_command", 10,
         std::bind(&VogueMerry::command_callback, this, _1));
+        
+    VogueMerry::init_parameters();
 }  
+
+void VogueMerry::init_parameters(){
+    float val_default = 0.0;
+    this->declare_parameter<double>("abscisse_initial",val_default);
+    this->declare_parameter<double>("ordonne_initial",val_default);
+    this->declare_parameter<double>("cap_initial",val_default);
+
+    cap0 = this->get_parameter("cap_initial").as_double();
+    x0 = this->get_parameter("abscisse_initial").as_double();
+    y0 = this->get_parameter("ordonne_initial").as_double();
+}
 
 void VogueMerry::integration_euler(float u1){
     dx_(0,0) = cos(x_(2,0));
     dx_(1,0) = sin(x_(2,0));
-    dx_(1,0) = u1;
+    dx_(2,0) = u1;
     x_ = x_ + dx_*dt;
 }
+
 void VogueMerry::command_callback(const geometry_msgs::msg::Twist &msg){
-    float cap = msg.angular.z;
+    cap = msg.angular.z;
     RCLCPP_INFO(this->get_logger(), "I heard: '%f'", cap);
 }
 
@@ -47,15 +66,13 @@ void VogueMerry::command_callback(const geometry_msgs::msg::Twist &msg){
             // En dehors d'un node, on peut utiliser rclcpp::get_logger("rclcpp")
             //RCLCPP_INFO(this->get_logger(), "J'envoie une position Pose Stamped ");
             
-            //RCLCPP_INFO(this->get_logger(), "x : [%f] , y : [%f] " ,
-            //message.pose.position.x , message.pose.position.y );
+            RCLCPP_INFO(this->get_logger(), "x : [%f] , y : [%f] " ,
+            message.pose.position.x , message.pose.position.y );
 
+            RCLCPP_INFO(this->get_logger(),"cap  : [%f]" , x_(2,0));
             // Publie le message en utilisation l'objet publisher
             pose_publisher_->publish(message);
-
         }
-
-
 
 int main(int argc, char * argv[]) {
         // Initialise ROS 2 pour l'executable

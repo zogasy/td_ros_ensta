@@ -46,8 +46,9 @@ void VogueMerry::command_callback(const geometry_msgs::msg::Twist &msg){
             // Il est également possible d'utiliser RCLCPP_WARN
             // En dehors d'un node, on peut utiliser rclcpp::get_logger("rclcpp")
             //RCLCPP_INFO(this->get_logger(), "J'envoie une position Pose Stamped ");
-            RCLCPP_INFO(this->get_logger(), "x : [%f] , y : [%f] " ,
-            message.pose.position.x , message.pose.position.y );
+            
+            //RCLCPP_INFO(this->get_logger(), "x : [%f] , y : [%f] " ,
+            //message.pose.position.x , message.pose.position.y );
 
             // Publie le message en utilisation l'objet publisher
             pose_publisher_->publish(message);

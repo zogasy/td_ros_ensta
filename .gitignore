@@ -1,0 +1,24 @@
+# Ignorer les dossiers générés par la compilation ROS 2
+build/
+install/
+log/
+
+# Ignorer les fichiers générés par le système
+*.swp
+*.swo
+*.bak
+*.tmp
+*~
+
+# Ignorer les fichiers spécifiques à l'environnement ROS 2
+.colcon/
+src/CMakeLists.txt
+
+# Ignorer les fichiers spécifiques à l'IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Ignorer les fichiers de configuration du système
+.DS_Store
+Thumbs.db

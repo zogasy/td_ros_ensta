@@ -1,8 +1,8 @@
 Zoboat: # Fait référence au nom du node executé
   ros__parameters: # Attention, il y a deux "_"
-    abscisse_initial: 100.0 
+    abscisse_initial: 0.0 
     cap_initial: 1.50 
-    ordonne_initial: 50.0
+    ordonne_initial: 0.0
     info: "position du bateau initial "
 
  

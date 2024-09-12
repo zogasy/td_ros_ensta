@@ -13,15 +13,14 @@ void VogueMerry::init_interfaces(){
     // Créer un publisher de type std_msgs/msg/String sur le topic "topic", avec
     // une liste d'attente de 10 messages maximum
     //publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-    pose_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("position", 10);
+    pose_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("position_bato", 10);
+    mesh_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("bateau3D",10);
 
     // Créer un timer qui appelle la fonction time_callback toutes les 500ms
     timer_ = this->create_wall_timer(freq, std::bind(&VogueMerry::publish_pose, this));
-
     //Abonnement au message Twist pour la commande
     subscription_ = this->create_subscription<geometry_msgs::msg::Twist>("angular_command", 10,
         std::bind(&VogueMerry::command_callback, this, _1));
-        
     VogueMerry::init_parameters();
 }  
 
@@ -50,28 +49,52 @@ void VogueMerry::command_callback(const geometry_msgs::msg::Twist &msg){
 
  void VogueMerry::publish_pose() {
             VogueMerry::integration_euler(cap);
-            tf2::Quaternion q;
-            q.setRPY(0,0,x_(2,0));
+            //tf2::Quaternion q;
+            //q.setRPY(0,0,x_(2,0));
+            bateau_orientation.setRPY(0,0,x_(2));
             auto message = geometry_msgs::msg::PoseStamped();
             // Créer un object message de type String
             // Rempli le contenu du message
-            message.header.set__stamp(this->get_clock()->now());
-            message.header.set__frame_id("bato");
+            message.header.stamp = this->now();
+            message.header.frame_id = "map";
             message.pose.position.set__x(x_(0,0));
             message.pose.position.set__y(x_(1,0));
             message.pose.position.set__z(0.0);
-            message.pose.orientation = tf2::toMsg(q);
+            message.pose.orientation = tf2::toMsg(bateau_orientation);
+
+//Marker pour visualiser le meshfile sur rviz
+            visualization_msgs::msg::Marker marker;
+            marker.header.frame_id = "map";
+            marker.header.stamp = this->now();
+            marker.ns = "boat";
+            marker.id = 0;
+            marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+            marker.action = visualization_msgs::msg::Marker::ADD;
+
+            marker.pose.position.set__x(x_(0,0));
+            marker.pose.position.set__y(x_(1,0));
+            marker.pose.position.set__z(0.0);
+            marker.pose.orientation = tf2::toMsg(bateau_orientation);
+            
+
+            marker.scale.x = 1;
+            marker.scale.y = 1;
+            marker.scale.z = 1;
+            marker.color.a = 1.0; // alpha = transparence
+            marker.color.r = 1.0;
+            marker.color.g = 1.0;
+            marker.color.b = 1.0;
+            marker.mesh_resource = "package://td2/meshes/boat.dae";
             // Affiche un log dans la console (format de fprintf)
             // Il est également possible d'utiliser RCLCPP_WARN
             // En dehors d'un node, on peut utiliser rclcpp::get_logger("rclcpp")
-            //RCLCPP_INFO(this->get_logger(), "J'envoie une position Pose Stamped ");
-            
+            pose_publisher_->publish(std::move(message));
+            mesh_publisher_->publish(marker);
             RCLCPP_INFO(this->get_logger(), "x : [%f] , y : [%f] " ,
             message.pose.position.x , message.pose.position.y );
 
             RCLCPP_INFO(this->get_logger(),"cap  : [%f]" , x_(2,0));
             // Publie le message en utilisation l'objet publisher
-            pose_publisher_->publish(message);
         }
 
 int main(int argc, char * argv[]) {

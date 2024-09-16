@@ -67,6 +67,7 @@ void VogueMerry::command_callback(const geometry_msgs::msg::Twist &msg){
             marker.header.frame_id = "map";
             marker.header.stamp = this->now();
             marker.ns = "boat";
+
             marker.id = 0;
             marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
             marker.action = visualization_msgs::msg::Marker::ADD;
@@ -85,6 +86,8 @@ void VogueMerry::command_callback(const geometry_msgs::msg::Twist &msg){
             marker.color.g = 1.0;
             marker.color.b = 1.0;
             marker.mesh_resource = "package://td2/meshes/boat.dae";
+            //marker.mesh_resource = "package://td2/meshes/coque_solide.dae";
+
             // Affiche un log dans la console (format de fprintf)
             // Il est également possible d'utiliser RCLCPP_WARN
             // En dehors d'un node, on peut utiliser rclcpp::get_logger("rclcpp")
